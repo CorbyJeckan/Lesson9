@@ -15,6 +15,7 @@ namespace FileManager
 
         static void Main(string[] args)
         {
+            Console.BackgroundColor = ConsoleColor.DarkRed;
             Console.Title = "FileManager";
 
             Console.SetWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -125,8 +126,28 @@ namespace FileManager
         {
            StringBuilder tree = new StringBuilder();
             GetTree(tree, dir, "", true);
+            DrawWindow(0, 0, WINDOW_WIDTH, 18);
+            (int currentLeft, int currentTop) = GetCursorPosition();
+            int pageLines = 16;
+            string[] lines = tree.ToString().Split(new char[] { '\n' });
+            int pageTotal = (lines.Length + pageLines - 1) / pageLines;
+            if (page > pageTotal)
+                page = pageTotal;
 
-            //todo вывести дерево на экран
+            for (int i = (page - 1) * pageLines, counter = 0; i < page * pageLines; i++, counter++) 
+            {
+                if (lines.Length - 1 > i)
+                {
+                    Console.SetCursorPosition(currentLeft + 1, currentTop + 1 + counter);
+                    Console.WriteLine(lines[i]);
+                }
+            }
+
+            //footer
+            string footer = $"╣ {page} of {pageTotal} ╟";
+            Console.SetCursorPosition(WINDOW_WIDTH / 2 - footer.Length / 2, 17);
+            Console.WriteLine(footer);
+
         }
 
         static void GetTree(StringBuilder tree, DirectoryInfo dir, string indent, bool lastDirectory)
@@ -143,7 +164,21 @@ namespace FileManager
                 indent += "│";
             }
 
-            tree.Append($"{dir.Name}\n");
+            tree.Append($"{dir.Name}\n"); // - переход на следующую строку
+
+           //todo добавляем отображение файлов
+            FileInfo[] subFiles = dir.GetFiles();
+            for (int i = 0; i < subFiles.Length; i++)
+            {
+                if (i == subFiles.Length - 1)
+                {
+                    tree.Append($"{indent}└{subFiles[i].Name}\n");
+                }
+                else
+                {
+                    tree.Append($"{indent}├{subFiles[i].Name}\n");
+                }
+            }
 
             DirectoryInfo[] subDirects = dir.GetDirectories();
             for (int i = 0; i < subDirects.Length; i++)
