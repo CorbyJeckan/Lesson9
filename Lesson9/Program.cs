@@ -10,6 +10,14 @@ namespace FileManager
     {
         static void Main(string[] args)
         {
+            Console.Title = "FileManager";
+            
+            Console.ReadKey(true);
+        }
+
+        static void DrawWindow(int x, int y, int width, int height)
+        {
+
         }
     }
 }
